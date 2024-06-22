@@ -1,5 +1,5 @@
 function Header() {
-  return <header className="bg-red">Sproot</header>;
+  return <header className="">Sproot</header>;
 }
 
 export default Header;
