@@ -10,8 +10,12 @@ function Header() {
         <Sprout className="text-green-600" />
       </div>
       <div>
-        <Button variant="default" className="bg-green-600 hover:bg-green-800">
-          Try it out!
+        <Button
+          variant="default"
+          className="bg-green-600 hover:bg-green-800"
+          asChild
+        >
+          <Link to="/">Try it out!</Link>
         </Button>
       </div>
     </header>
