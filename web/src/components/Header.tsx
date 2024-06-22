@@ -15,7 +15,7 @@ function Header() {
           className="bg-green-600 hover:bg-green-800"
           asChild
         >
-          <Link to="/">Try it out!</Link>
+          <Link to="/planner">Try it out!</Link>
         </Button>
       </div>
     </header>

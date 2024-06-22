@@ -1,8 +1,7 @@
-import Header from "./components/Header";
-import { ProfileForm } from "./components/ProfileForm"; // Adjust the import
+import Header from "./../components/Header";
+import { ProfileForm } from "./../components/ProfileForm";
 
-
-function App() {
+function Planner() {
   return (
     <>
       <Header />
@@ -19,4 +18,4 @@ function App() {
   );
 }
 
-export default App;
+export default Planner;
