@@ -1,4 +1,6 @@
 import Header from "./components/Header";
+import { ProfileForm } from "./components/ProfileForm"; // Adjust the import
+
 
 function App() {
   return (
@@ -12,6 +14,7 @@ function App() {
       {/* Budget */}
 
       {/* Interests */}
+      <ProfileForm />
     </>
   );
 }
