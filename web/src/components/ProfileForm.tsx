@@ -34,13 +34,15 @@ export function ProfileForm() {
     defaultValues: {
       location: "",
       duration: "",
-      budget: "",
+      budget: 0,
       dateRange: {
         from: new Date(2022, 0, 20),
         to: addDays(new Date(2022, 0, 20), 20),
       },
     },
   });
+
+  const [budget, setBudget] = React.useState(100); // Define the state for budget
 
   function onSubmit(values: any) { // Adjust type as necessary
     console.log(values);
@@ -71,13 +73,16 @@ export function ProfileForm() {
           name="budget"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Budget</FormLabel>
+              <FormLabel>Budget: ${budget}</FormLabel>
               <FormControl>
-              <Slider
+                <Slider
                   defaultValue={[field.value]}
-                  max={100}
-                  step={1}
-                  onValueChange={(value) => field.onChange(value[0])}
+                  max={5000}
+                  step={10}
+                  onValueChange={(value) => {
+                    setBudget(value[0]);
+                    field.onChange(value[0]);
+                  }}
                 />
               </FormControl>
               <FormDescription>
