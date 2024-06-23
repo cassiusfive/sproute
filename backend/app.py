@@ -9,13 +9,13 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 
 # Set your OpenAI API key from environment variables
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+# os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
 
 # Define the model
 # llm = ChatOpenAI(model="gpt-4")
-llm = ChatGroq(model="llama3-8b-8192")
+llm = ChatGroq(temperature=0, model="mixtral-8x7b-32768")
 
 
 class ItineraryItem(BaseModel):
