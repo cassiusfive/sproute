@@ -146,14 +146,7 @@ def travel():
     )
 
     return jsonify(
-        {
-            "location": location,
-            "budget": budget,
-            "interests": interests,
-            "start_date": start_date,
-            "end_date": end_date,
-            "itinerary": recommendation["itinerary"],
-        }
+        recommendation["itinerary"]
     )
 
 
