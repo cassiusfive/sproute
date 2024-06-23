@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import openai
 import os
 from langchain_openai import ChatOpenAI
@@ -7,6 +8,7 @@ from typing import List
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)
 
 # Set your OpenAI API key from environment variables
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -58,7 +60,7 @@ def get_travel_recommendation(location, budget, interests, start_date, end_date,
 
 
     result = structured_llm.invoke(prompt).dict()
-    
+
     # Calculate CO2 emissions for each activity
     for day in result['itinerary']:
         for activity in day['activities']:
