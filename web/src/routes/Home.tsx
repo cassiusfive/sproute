@@ -3,7 +3,7 @@ import Header from "../components/Header";
 function Home() {
   return (
     <>
-      <Header />
+      <Header showTryIt />
       <div className="flex flex-col items-center">
         <h1 className="mt-16 text-6xl font-bold text-center">
           Explore the world, <br />

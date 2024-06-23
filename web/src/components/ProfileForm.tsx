@@ -32,7 +32,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"; // Ensure this import path is correct
 
 export function ProfileForm() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +48,8 @@ export function ProfileForm() {
 
   const [budget, setBudget] = React.useState(1000); // Define the state for budget
 
-  function onSubmit(values: any) { // Adjust type as necessary
+  function onSubmit(values: any) {
+    // Adjust type as necessary
     toast({
       title: "You submitted the following values:",
       description: (
@@ -57,12 +58,14 @@ export function ProfileForm() {
         </pre>
       ),
     });
-    navigate('/itenerary'); 
+    navigate("/itinerary");
   }
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-2xl font-semibold text-center mb-6">Travel Preferences Form</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6">
+        Travel Preferences Form
+      </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -74,14 +77,11 @@ export function ProfileForm() {
                 <FormControl>
                   <Input placeholder="Enter location" {...field} />
                 </FormControl>
-                <FormDescription>
-                
-                </FormDescription>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-
 
           <FormField
             control={form.control}
@@ -144,33 +144,25 @@ export function ProfileForm() {
                       <FormControl>
                         <RadioGroupItem value="sightseeing" />
                       </FormControl>
-                      <FormLabel className="font-normal">
-                        Sightseeing
-                      </FormLabel>
+                      <FormLabel className="font-normal">Sightseeing</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="adventure" />
                       </FormControl>
-                      <FormLabel className="font-normal">
-                        Adventure
-                      </FormLabel>
+                      <FormLabel className="font-normal">Adventure</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="relaxation" />
                       </FormControl>
-                      <FormLabel className="font-normal">
-                        Relaxation
-                      </FormLabel>
+                      <FormLabel className="font-normal">Relaxation</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="cultural" />
                       </FormControl>
-                      <FormLabel className="font-normal">
-                        Cultural
-                      </FormLabel>
+                      <FormLabel className="font-normal">Cultural</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
@@ -187,7 +179,9 @@ export function ProfileForm() {
             )}
           />
 
-          <Button type="submit" className="w-full">Submit</Button>
+          <Button type="submit" className="w-full">
+            Submit
+          </Button>
         </form>
       </Form>
     </div>
@@ -222,7 +216,7 @@ function DatePickerWithRange({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
