@@ -1,5 +1,6 @@
 import Header from "../components/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import DayPlan, { Activity } from "../components/DayPlan";
 
@@ -33,7 +34,12 @@ const SAMPLE_DATA: Activity[][] = [
 ];
 
 function Itinerary() {
+  const location = useLocation();
   const [dayPlans, setDayPlans] = useState<Activity[][]>(SAMPLE_DATA);
+
+  useEffect(() => {
+    console.log(location.state.formdata);
+  }, [location]);
 
   return (
     <>
