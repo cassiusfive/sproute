@@ -3,19 +3,17 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: flask-backend
+    container_name: sproute-api
     env_file: ".env"
     ports:
       - "3000:3000"
     volumes:
       - ./backend:/app
 
-  web:
+  frontend:
     build:
       context: ./web
       dockerfile: Dockerfile
-    container_name: vite-web
-    environment:
-      PORT: "5173"
+    container_name: sproute-web
     ports:
       - "5173:5173"
