@@ -1,6 +1,8 @@
 flask
 openai
+langchain
 langchain-openai
 langchain-core
+langchain-groq
 pydantic
 flask-cors
