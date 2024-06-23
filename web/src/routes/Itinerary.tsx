@@ -25,13 +25,20 @@ async function fetchItinerary(formdata: any): Promise<DayItinerary[]> {
 
 function Itinerary() {
   const location = useLocation();
+  const { formdata } = location.state;
   const [itinerary, setItinerary] = useState<DayItinerary[]>();
 
   useEffect(() => {
-    fetchItinerary(location.state.formdata).then((plans) =>
-      setItinerary(plans),
-    );
-  }, [location]);
+    fetchItinerary(formdata).then((plans) => setItinerary(plans));
+  }, [formdata]);
+
+  const itineraryComponent = itinerary ? (
+    itinerary.map((dayItinerary, i) => (
+      <DayPlan title={`Day ${i + 1}`} plan={dayItinerary} />
+    ))
+  ) : (
+    <></>
+  );
 
   return (
     <>
@@ -39,10 +46,7 @@ function Itinerary() {
       <main className="flex flex-col px-4 items-center">
         <div>
           <h1 className="text-4xl font-bold text-center mt-4">Itinerary</h1>
-          {itinerary &&
-            itinerary.map((dayItinerary, i) => (
-              <DayPlan title={`Day ${i + 1}`} plan={dayItinerary} />
-            ))}
+          {itineraryComponent}
         </div>
       </main>
     </>
