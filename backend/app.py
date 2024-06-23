@@ -1,32 +1,48 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
+import openai
 import os
-import requests
 from langchain_openai import ChatOpenAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
-from icalendar import Calendar, Event
 from datetime import datetime
 
 app = Flask(__name__)
 
-# Set your OpenAI and Google API keys from environment variables
-openai_api_key = os.getenv("OPENAI_API_KEY")
-google_api_key = os.getenv("GOOGLE_API_KEY")
-google_cse_id = os.getenv("GOOGLE_CSE_ID")
+# Set your OpenAI API key from environment variables
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Define the model
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125", api_key=openai_api_key)
+llm = ChatOpenAI(model="gpt-4o")
 
 
 class ItineraryItem(BaseModel):
-    date: str = Field(description="The date range of the activity")
+
+    begin: str = Field(description="The start time of the activity")
+    end: str = Field(description="The end time of the activity")
     location: str = Field(description="The location of the activity")
-    description: str = Field(description="A description of the activity")
-    image_url: str = Field(description="URL of the image associated with the activity")
+    title: str = Field(description="A description of the activity")
+    description: str = Field(
+        description="A detailed longer description of the activity"
+    )
+    cost: float = Field(description="The cost of the activity in dollars")
+    carbon: float = Field(description="The carbon footprint of the activity in kg")
+    mode: str = Field(
+        description="Mode of transportation between previous activity and this activity"
+    )
+    distance: float = Field(description="The distance traveled for the activity in mi")
+    emissions: float = Field(
+        description="The estimated CO2 emissions of transportation in kg"
+    )
+    transportation_time_from_prev_to_here: str = Field(
+        description="The total time of transportation between last activity and this activity"
+    )
+    transportation_cost_from_prev_to_here: float = Field(
+        description="The total cost of transportation between last activity and this activity"
+    )
 
 
 class DayItinerary(BaseModel):
-    day: int = Field(description="Day number of the itinerary")
+    date: str = Field(description="Date of the itinerary")
     activities: List[ItineraryItem] = Field(
         description="List of activities for the day"
     )
@@ -39,63 +55,56 @@ class Itinerary(BaseModel):
 structured_llm = llm.with_structured_output(Itinerary)
 
 
-def get_image_url(activity):
-    # Use the location address to search for an appropriate image
-    query = f"{activity['location']}"
-    image_urls = search_images(query, google_api_key, google_cse_id)
-    return image_urls[0] if image_urls else None
+def get_emission_factor(vehicle_type):
+    emission_factors = {"car": 0.121, "bus": 0.028, "train": 0.041, "airplane": 0.150}
+    return emission_factors.get(vehicle_type.lower(), 0)
 
 
-def get_travel_recommendation(location, budget, date_range, interests):
-    prompt = f"Create a detailed itinerary for a trip to {location} from {date_range[0]} to {date_range[1]} with a budget of {budget} dollars. Each event should include the date range, a detailed location address suitable for Google Maps, and a description. The itinerary should be structured day by day, with each day containing multiple events. Consider the day of travel; on travel days, include fewer activities, while non-travel days should have multiple experiences or things to see. Format each day's itinerary as: {{'day': day_number, 'activities': [{{'date': 'date_range', 'location': 'full_address', 'description': 'activity description', 'image_url': 'image_url'}}]}}."
-    new_prompt = prompt = f"Create a detailed and sustainable itinerary for a trip to {location} from {date_range[0]} to {date_range[1]} with a budget of {budget} dollars. " \
-             f"The traveler is interested in {interests}. " \
-             f"Each event should include: " \
-             f"- Time range (start_time - end_time) " \
-             f"- Detailed location address suitable for Google Maps " \
-             f"- Description of the activity " \
-             f"- Cost of the activity " \
-             f"- carbon footprint from the activity " \
-             f"- most sustaiable mode of transportation to get there from the previous activity while also being realistic" \
-             f"- time of transporatation to get there using that mode" \
-             f"- distance between this activity and previous activity" \
-             f"- emmissions from the trip to the activity from the previous activity" \
-             f"Plan for multiple activities each day, starting at 9 am and ending at 10 pm, make sure each day has a breakfast, lunch and dinner. " \
-             f"Suggest the most eco-friendly activities possible. " \
-             f"The itinerary should be structured day by day, with each day containing a list of event in the following format: " \
-             f"{{'date': 'YYYY-MM-DD', 'activities': [{{'begin': 'start_time', 'end': 'end_time', 'location': 'full_address', 'description': 'activity description', 'carbon': 'carbon footprint', 'mode': 'mode of transportation', 'distance': total_distance_in_km, 'emissions': 'transportation emissions', 'time': 'duration of travel time between previous activity to this activity'}}]}}."
-
-    
-    result = structured_llm.invoke(prompt)
-
-    # Enhance the result with image URLs
-    enhanced_itinerary = []
-    for day in result.dict()["itinerary"]:
-        enhanced_day = {"day": day["day"], "activities": []}
-        for activity in day["activities"]:
-            image_url = get_image_url(activity)
-            if image_url:
-                activity["image_url"] = image_url
-            enhanced_day["activities"].append(activity)
-        enhanced_itinerary.append(enhanced_day)
-
-    return {"itinerary": enhanced_itinerary}
+def calculate_co2_emissions(vehicle_type, group_size, distance):
+    emission_factor = get_emission_factor(vehicle_type)
+    total_emissions = emission_factor * distance * group_size
+    return total_emissions
 
 
-def create_ics_file(itinerary, file_path):
-    cal = Calendar()
-    for day in itinerary["itinerary"]:
-        for activity in day["activities"]:
-            event = Event()
-            # Assuming the time is not specified and defaulting to all-day events
-            dt = datetime.strptime(activity["date"], "%Y-%m-%d").date()
-            event.add("summary", activity["description"])
-            event.add("dtstart", dt)
-            event.add("dtend", dt)
-            event.add("location", activity["location"])
-            cal.add_component(event)
-    with open(file_path, "wb") as f:
-        f.write(cal.to_ical())
+def get_travel_recommendation(location, budget, interests, start_date, end_date):
+    prompt = (
+        f"Create a detailed and sustainable itinerary for a trip to {location} from {start_date} to {end_date} with a budget of {budget} dollars. "
+        f"The traveler is interested in {interests}. "
+        "Each event should include: "
+        "- Time range (start_time - end_time) "
+        "- Detailed location address suitable for Google Maps "
+        "- Title of activity"
+        "- Enticing description of the activity "
+        "- Cost of the activity "
+        "- carbon footprint from the activity "
+        "- most sustainable mode of transportation to get there from the previous activity while also being realistic "
+        "- time of transportation to get there using that mode "
+        "- distance between this activity and previous activity "
+        "- transportation cost from previous activity to this one "
+        "- emissions from the trip to the activity from the previous activity "
+        "Plan for multiple activities each day, starting at 9 am and ending at 10 pm, make sure each day has a breakfast, lunch and dinner. Make sure you take into consideration the time of transportation when giving the start date of the event by making sure to leave a buffer. "
+        "Suggest the most eco-friendly activities possible. "
+        "The itinerary should be structured day by day, with each day containing a list of event in the following format: "
+        "{'date': 'YYYY-MM-DD', 'activities': [\n"
+        "    {\n"
+        "        'mode': 'mode of transportation',\n"
+        "        'distance': 'total_distance_in_km',\n"
+        "        'emissions': 'transportation emissions',\n"
+        "        'transportation_time_from_prev_to_here': 'duration of travel time between previous activity to this activity',\n"
+        "        'transportation_cost_from_prev_to_here': 'transportation cost from previous activity to here',\n"
+        "        'begin': 'start_time',\n"
+        "        'end': 'end_time',\n"
+        "        'location': 'full_address',\n"
+        "        'title': 'title of activity',\n"
+        "        'description': 'detailed activity description',\n"
+        "        'cost': 'activity cost',\n"
+        "        'carbon': 'carbon footprint'\n"
+        "    }\n"
+        "]}"
+    )
+
+    result = structured_llm.invoke(prompt).dict()
+    return result
 
 
 @app.route("/")
@@ -108,80 +117,44 @@ def travel():
     data = request.json
     location = data.get("location")
     budget = data.get("budget")
-    date_range = data.get("date_range")
+    interests = data.get("interests")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
 
-    if not location or not budget or not date_range or len(date_range) != 2:
+    # Validate the inputs
+    try:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+
+    if not location or not budget or not start_date or not end_date:
         return (
             jsonify(
                 {
-                    "error": "Please provide location, budget, and a valid date range (start_date, end_date)"
+                    "error": "Please provide location, budget, interests, start_date, end_date, vehicle_type, and group_size"
                 }
             ),
             400,
         )
 
-    recommendation = get_travel_recommendation(location, budget, date_range)
+    if start_date_obj > end_date_obj:
+        return jsonify({"error": "start_date must be before end_date"}), 400
 
-    # Define the ICS file path
-    ics_file_path = os.path.join("ics_files", "calendar.ics")
-
-    # Ensure the directory exists
-    os.makedirs("ics_files", exist_ok=True)
-
-    # Create the ICS file
-    create_ics_file(recommendation, ics_file_path)
+    recommendation = get_travel_recommendation(
+        location, budget, interests, start_date, end_date
+    )
 
     return jsonify(
         {
             "location": location,
             "budget": budget,
-            "date_range": date_range,
+            "interests": interests,
+            "start_date": start_date,
+            "end_date": end_date,
             "itinerary": recommendation["itinerary"],
-            "ics_file_path": ics_file_path,
         }
     )
-
-
-@app.route("/download_ics", methods=["GET"])
-def download_ics():
-    ics_file_path = request.args.get("ics_file_path")
-    if not ics_file_path or not os.path.exists(ics_file_path):
-        return (
-            jsonify(
-                {"error": "ICS file not found. Please ensure the file path is correct."}
-            ),
-            400,
-        )
-
-    return send_file(ics_file_path, as_attachment=True)
-
-
-def search_images(query, api_key, cse_id):
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        "key": api_key,
-        "cx": cse_id,
-        "q": query,
-        "searchType": "image",
-        "num": 1,
-        "rights": "cc_publicdomain|cc_attribute",  # Filter by Creative Commons licenses
-    }
-
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()  # Raise an exception for bad responses
-        data = response.json()
-
-        image_urls = []
-        if "items" in data:
-            for item in data["items"]:
-                image_urls.append(item["link"])
-
-        return image_urls
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching images: {e}")
-        return []
 
 
 if __name__ == "__main__":
