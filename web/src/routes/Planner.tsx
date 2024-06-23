@@ -5,7 +5,9 @@ function Planner() {
   return (
     <>
       <Header />
-      <ProfileForm />
+      <div className="mt-4">
+        <ProfileForm />
+      </div>
     </>
   );
 }

@@ -8,7 +8,7 @@ type HeaderProps = {
 
 function Header({ showTryIt = false }: HeaderProps) {
   return (
-    <header className="p-4 px-6 border-b-2 flex justify-between">
+    <header className="p-4 px-6 border-b-2 border-black flex justify-between">
       <div className="text-2xl font-bold flex items-center gap-1">
         <Link to="/" className="flex items-center gap-1">
           Sproute
