@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS, cross_origin
 import openai
 import os
@@ -15,43 +15,27 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Define the model
 llm = ChatOpenAI(model="gpt-4o")
-#
 
 class ItineraryItem(BaseModel):
-
     begin: str = Field(description="The start time of the activity")
     end: str = Field(description="The end time of the activity")
     location: str = Field(description="The location of the activity")
     title: str = Field(description="A description of the activity")
-    description: str = Field(
-        description="A detailed longer description of the activity"
-    )
+    description: str = Field(description="A detailed longer description of the activity")
     cost: float = Field(description="The cost of the activity in dollars")
     carbon: float = Field(description="The carbon footprint of the activity in kg")
-    mode: str = Field(
-        description="Mode of transportation between previous activity and this activity"
-    )
+    mode: str = Field(description="Mode of transportation between previous activity and this activity")
     distance: float = Field(description="The distance traveled for the activity in mi")
-    emissions: float = Field(
-        description="The estimated CO2 emissions of transportation in kg"
-    )
-    transportation_time_from_prev_to_here: str = Field(
-        description="The total time of transportation between last activity and this activity"
-    )
-    transportation_cost_from_prev_to_here: float = Field(
-        description="The total cost of transportation between last activity and this activity"
-    )
-
+    emissions: float = Field(description="The estimated CO2 emissions of transportation in kg")
+    transportation_time_from_prev_to_here: str = Field(description="The total time of transportation between last activity and this activity")
+    transportation_cost_from_prev_to_here: float = Field(description="The total cost of transportation between last activity and this activity")
 
 class DayItinerary(BaseModel):
     date: str = Field(description="Date of the itinerary")
-    activities: List[ItineraryItem] = Field(
-        description="List of activities for the day"
-    )
+    activities: List[ItineraryItem] = Field(description="List of activities for the day")
 
 class Itinerary(BaseModel):
     itinerary: List[DayItinerary] = Field(description="Day by day itinerary")
-
 
 structured_llm = llm.with_structured_output(Itinerary)
 
@@ -59,12 +43,10 @@ def get_emission_factor(vehicle_type):
     emission_factors = {"car": 0.121, "bus": 0.028, "train": 0.041, "airplane": 0.150}
     return emission_factors.get(vehicle_type.lower(), 0)
 
-
 def calculate_co2_emissions(vehicle_type, group_size, distance):
     emission_factor = get_emission_factor(vehicle_type)
     total_emissions = emission_factor * distance * group_size
     return total_emissions
-
 
 def get_travel_recommendation(location, budget, interests, start_date, end_date):
     prompt = (
@@ -103,14 +85,11 @@ def get_travel_recommendation(location, budget, interests, start_date, end_date)
         "]}"
     )
 
-    result = structured_llm.invoke(prompt).dict()
-    return result
-
+    return structured_llm.stream(prompt)
 
 @app.route("/")
 def home():
     return "Welcome to the Eco-Friendly Travel App!"
-
 
 @app.route("/travel", methods=["POST"])
 def travel():
@@ -132,7 +111,7 @@ def travel():
         return (
             jsonify(
                 {
-                    "error": "Please provide location, budget, interests, start_date, end_date, vehicle_type, and group_size"
+                    "error": "Please provide location, budget, interests, start_date, and end_date"
                 }
             ),
             400,
@@ -141,14 +120,11 @@ def travel():
     if start_date_obj > end_date_obj:
         return jsonify({"error": "start_date must be before end_date"}), 400
 
-    recommendation = get_travel_recommendation(
-        location, budget, interests, start_date, end_date
-    )
+    def generate():
+        for chunk in get_travel_recommendation(location, budget, interests, start_date, end_date):
+            yield f"data: {chunk}\n\n"
 
-    return jsonify(
-        recommendation["itinerary"]
-    )
-
+    return Response(generate(), content_type="text/event-stream")
 
 if __name__ == "__main__":
     app.run(debug=True)
