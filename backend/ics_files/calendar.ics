@@ -1,0 +1,74 @@
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:Enjoy a relaxing walk along the Berkeley Marina with stunning view
+ s of the bay and Golden Gate Bridge.
+DTSTART;VALUE=DATE:20240701
+DTEND;VALUE=DATE:20240701
+LOCATION:Berkeley Marina\, 201 University Ave\, Berkeley\, CA 94710
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Explore the historic campus of UC Berkeley\, known for its beautif
+ ul architecture and botanical gardens.
+DTSTART;VALUE=DATE:20240702
+DTEND;VALUE=DATE:20240702
+LOCATION:University of California\, Berkeley\, Berkeley\, CA 94720
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Immerse yourself in art and film at this renowned cultural institu
+ tion featuring contemporary and classic works.
+DTSTART;VALUE=DATE:20240702
+DTEND;VALUE=DATE:20240702
+LOCATION:Berkeley Art Museum and Pacific Film Archive\, 2155 Center St\, B
+ erkeley\, CA 94720
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Hike to the top of Indian Rock for panoramic views of the Bay Area
+  and enjoy a picnic at this natural rock formation.
+DTSTART;VALUE=DATE:20240703
+DTEND;VALUE=DATE:20240703
+LOCATION:Indian Rock Park\, 950 Indian Rock Ave\, Berkeley\, CA 94707
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Indulge in culinary delights at the Gourmet Ghetto\, a food lover'
+ s paradise with a variety of eateries and cafes.
+DTSTART;VALUE=DATE:20240703
+DTEND;VALUE=DATE:20240703
+LOCATION:Gourmet Ghetto\, Shattuck Ave & Vine St\, Berkeley\, CA 94709
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Spend the day at Tilden Park\, featuring hiking trails\, a botanic
+ al garden\, and the Little Farm for a fun family experience.
+DTSTART;VALUE=DATE:20240704
+DTEND;VALUE=DATE:20240704
+LOCATION:Tilden Regional Park\, 2501 Grizzly Peak Blvd\, Orinda\, CA 94563
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Engage in interactive science exhibits and enjoy breathtaking view
+ s of the Bay Area from the Lawrence Hall of Science.
+DTSTART;VALUE=DATE:20240705
+DTEND;VALUE=DATE:20240705
+LOCATION:Lawrence Hall of Science\, 1 Centennial Dr\, Berkeley\, CA 94720
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Stroll through the beautiful Rose Garden with over 250 varieties o
+ f roses and stunning views of San Francisco Bay.
+DTSTART;VALUE=DATE:20240705
+DTEND;VALUE=DATE:20240705
+LOCATION:Berkeley Rose Garden\, 1200 Euclid Ave\, Berkeley\, CA 94708
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Explore the vibrant Telegraph Avenue\, known for its eclectic shop
+ s\, street performers\, and cultural diversity.
+DTSTART;VALUE=DATE:20240706
+DTEND;VALUE=DATE:20240706
+LOCATION:Telegraph Avenue\, Berkeley\, CA 94704
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Experience the local produce and artisan goods at the Berkeley Far
+ mers' Market\, a hub of community and fresh food.
+DTSTART;VALUE=DATE:20240707
+DTEND;VALUE=DATE:20240707
+LOCATION:Berkeley Farmers' Market\, Center St & MLK Jr Way\, Berkeley\, CA
+  94704
+END:VEVENT
+END:VCALENDAR
