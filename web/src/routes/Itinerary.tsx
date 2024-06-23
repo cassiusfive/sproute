@@ -18,35 +18,15 @@ async function fetchItinerary(formdata: any): Promise<DayItinerary[]> {
     },
   });
 
+  if (!res.ok) {
+    console.error("Failed to fetch itinerary", await res.text());
+    return [];
+  }
+
   const itinerary = await res.json();
-  async function fetchItinerary(formdata: any): Promise<DayItinerary[]> {
-    const payload = JSON.parse(formdata);
-    payload.start_date = payload.dateRange.from.split("T")[0];
-    payload.end_date = payload.dateRange.to.split("T")[0];
-    payload.interests = payload.type;
-
-    console.log("Payload:", payload); // Debugging line
-
-    const res = await fetch(import.meta.env.VITE_BACKEND_API + "/travel", {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      console.error("Failed to fetch itinerary", await res.text());
-      return [];
-    }
-
-    const itinerary = await res.json();
-    if (!Array.isArray(itinerary)) {
-      console.error("Invalid itinerary format", itinerary);
-      return [];
-    }
-
-    return itinerary as DayItinerary[];
+  if (!Array.isArray(itinerary)) {
+    console.error("Invalid itinerary format", itinerary);
+    return [];
   }
 
   return itinerary as DayItinerary[];
@@ -62,9 +42,11 @@ function Itinerary() {
   }, [formdata]);
 
   const itineraryComponent = itinerary ? (
-    itinerary.map((dayItinerary, i) => (
-      <DayPlan title={`Day ${i + 1}`} plan={dayItinerary} />
-    ))
+    <div className="space-y-8 max-w-4xl">
+      {itinerary.map((dayItinerary, i) => (
+        <DayPlan title={`Day ${i + 1}`} plan={dayItinerary} />
+      ))}
+    </div>
   ) : (
     <></>
   );
@@ -73,9 +55,11 @@ function Itinerary() {
     <>
       <Header />
       <main className="flex flex-col px-4 items-center">
-        <div>
-          <h1 className="text-4xl font-bold text-center mt-4">Itinerary</h1>
-          {itinerary && <DownloadIcs itinerary={itinerary} />}
+        <div className="">
+          <div className="flex flex-col items-center space-y-2 my-6">
+            <h1 className="text-4xl font-bold text-center">Itinerary</h1>
+            {itinerary && <DownloadIcs itinerary={itinerary} />}
+          </div>
           {itineraryComponent}
         </div>
       </main>

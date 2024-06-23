@@ -13,9 +13,7 @@ import {
   Earth,
   Map,
   Timer,
-  Leaf,
-  Wind,
-  Bike,
+  Footprints,
 } from "lucide-react";
 
 export type Activity = {
@@ -25,12 +23,12 @@ export type Activity = {
   end: string;
   location: string;
   cost: number;
-  emissions: number;
-  carbon: number;
+  carbon_footprint: number;
+  transportation_emissions: number;
   distance: number;
-  mode: string;
-  transportation_time_from_prev_to_here: string;
-  transportation_cost_from_prev_to_here: number;
+  transportation_method: string;
+  travel_time_to_next: string;
+  transportation_cost_to_next: number;
 };
 
 export type DayItinerary = {
@@ -40,39 +38,20 @@ export type DayItinerary = {
 
 type ActivityCardProps = {
   activity: Activity;
+  hideTransport?: boolean;
 };
 
-function ActivityCard({ activity }: ActivityCardProps) {
+function ActivityCard({ activity, hideTransport = false }: ActivityCardProps) {
   return (
-    <div className="relative mb-8">
-      <div className="w-full p-4 rounded-md mt-2 border-2 border-green-300 shadow-lg bg-green-50">
-        <div className="flex justify-between items-center text-green-900">
-          <div className="flex items-center gap-2">
-            <Map />
-            <span>{activity.mode}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CircleDollarSign className="min-w-[1.25rem]" />
-            <span>{activity.transportation_cost_from_prev_to_here}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Timer />
-            <span>{activity.transportation_time_from_prev_to_here}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin />
-            <span>{activity.distance} km</span>
-          </div>
-        </div>
-      </div>
-      <Card className="mt-4 rounded-lg shadow-lg border-2 border-green-300 bg-white">
+    <div className="relative">
+      <Card className="rounded-lg shadow-lg border-2 border-green-300 bg-white">
         <CardHeader>
-          <CardTitle className="text-green-900">{activity.title}</CardTitle>
-          <CardDescription className="text-green-700">
+          <CardTitle className="text-black">{activity.title}</CardTitle>
+          <CardDescription className="text-secondary-foreground">
             {activity.description}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center text-green-900">
+        <CardContent className="flex flex-col space-y-2 md:flex-row justify-between items-start md:items-center text-green-900">
           <div className="flex items-center gap-2">
             <Clock />
             <span>{activity.begin + " - " + activity.end}</span>
@@ -87,10 +66,34 @@ function ActivityCard({ activity }: ActivityCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <Earth />
-            <span>{activity.emissions} kg CO2</span>
+            <span className="text-green-700 font-semibold">
+              {activity.carbon_footprint} kg CO2
+            </span>
           </div>
         </CardContent>
       </Card>
+      {!hideTransport && (
+        <div className="w-full p-4 rounded-md my-2 border-2 border-green-300 shadow-lg bg-green-50">
+          <div className="flex justify-between items-center text-green-900">
+            <div className="flex items-center gap-2">
+              <Map />
+              <span>{activity.transportation_method}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CircleDollarSign className="min-w-[1.25rem]" />
+              <span>{activity.transportation_cost_to_next}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Timer />
+              <span>{activity.travel_time_to_next}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Footprints />
+              <span>{activity.distance} km</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -101,18 +104,16 @@ type DayPlanProps = {
 };
 
 function DayPlan({ title, plan }: DayPlanProps) {
-  const activityMap = plan.activities ? (
-    plan.activities.map((activity) => <ActivityCard activity={activity} />)
-  ) : (
-    <></>
-  );
-
   return (
-    <div className="bg-green-100 p-6 rounded-lg shadow-lg my-8">
+    <div className="bg-green-100 p-6 rounded-lg shadow-lg">
       <h3 className="text-3xl font-bold text-green-900 mb-6">{title}</h3>
-      <div className="space-y-8">
-        {plan.activities.map((activity) => (
-          <ActivityCard key={activity.title} activity={activity} />
+      <div className="">
+        {plan.activities.map((activity, i) => (
+          <ActivityCard
+            key={activity.title}
+            activity={activity}
+            hideTransport={plan.activities.length == i + 1}
+          />
         ))}
       </div>
     </div>

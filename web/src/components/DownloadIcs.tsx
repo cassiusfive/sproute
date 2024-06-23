@@ -1,6 +1,7 @@
 import * as ics from "ics";
 
 import { DayItinerary } from "./DayPlan";
+import { Button } from "./ui/button";
 
 type DownloadIcsProps = {
   itinerary: DayItinerary[];
@@ -58,7 +59,11 @@ function DownloadIcs({ itinerary }: DownloadIcsProps) {
     URL.revokeObjectURL(link.href);
   }
 
-  return <button onClick={handleDownload}>Download ICS</button>;
+  return (
+    <Button variant={"ghost"} onClick={handleDownload}>
+      Download ICS
+    </Button>
+  );
 }
 
 export default DownloadIcs;
