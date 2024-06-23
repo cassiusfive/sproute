@@ -18,7 +18,7 @@ os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
 
 # Define the model
-# llm = ChatOpenAI(model="gpt-3.5-turbo")
+# llm = ChatOpenAI(model="gpt-4o")
 llm = ChatGroq(temperature=0, model="llama3-70b-8192")
 
 
@@ -55,37 +55,6 @@ class Itinerary(BaseModel):
 
 structured_llm = llm.with_structured_output(Itinerary)
 
-
-# def get_travel_recommendation(location, budget, interests, start_date, end_date):
-#     start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-#     end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-#     num_days = (end_date_obj - start_date_obj).days + 1
-
-#     prompt = f"""Create a detailed and sustainable itinerary for a {num_days}-day trip to {location} from {start_date} to {end_date} with a total budget of {budget} dollars.
-#     The traveler is interested in {interests}.
-#     Plan for multiple activities each day, starting at 9 am and ending at 10 pm. Include breakfast, lunch, and dinner each day.
-#     Consider transportation time between activities and suggest eco-friendly options.
-#     Provide a variety of activities across all days, avoiding repetition.
-#     Ensure each day has a unique set of activities that showcase different aspects of {location}.
-#     Provide detailed information for each activity as specified in the ItineraryItem model.
-#     The itinerary should cover all {num_days} days of the trip.
-
-
-#     follow this verbage for your trip descriptions:
-
-#     "description": "Take a hike up Grizzly Peak for stunning views of the Bay Area. This eco-friendly activity is perfect for nature lovers.
-#     "description": "End your day with a delicious vegan dinner at Souley Vegan, a restaurant known for its plant-based soul food and commitment to sustainability.
-#     "description": "Enjoy a peaceful evening stroll at the Berkeley Marina, taking in the beautiful sunset views over the bay.
-#     "description": "Start your day with a unique breakfast experience at Cheeseboard Collective, a worker-owned cooperative bakery known for its fresh and organic baked goods.
-#     "description": "Explore the beautiful Berkeley Rose Garden, a historic landmark featuring over 1,500 rose bushes and stunning views of the Golden Gate Bridge.
-#     "description": "Engage with interactive exhibits and learn about science, technology, and the environment at the Lawrence Hall of Science.",
-
-#     """
-
-#     model = llm
-
-#     result = structured_llm.invoke(prompt)
-#     return result
 
 travel_recommendation_template = PromptTemplate(
     input_variables=[
