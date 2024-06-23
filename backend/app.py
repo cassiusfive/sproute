@@ -124,9 +124,11 @@ def travel():
         return jsonify({"error": "start_date must be before end_date"}), 400
 
     def generate():
+        string = 
         for chunk in get_travel_recommendation_stream(
             location, budget, interests, start_date, end_date
         ):
+            
             yield f"data: {json.dumps(chunk.content)}\n\n"
 
     return Response(generate(), content_type="text/event-stream")
