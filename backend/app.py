@@ -47,12 +47,15 @@ def calculate_co2_emissions(vehicle_type, group_size, distance):
     return total_emissions
 
 def get_travel_recommendation(location, budget, interests, start_date, end_date, vehicle_type, group_size):
-    prompt = (f"Create a detailed itinerary for a trip to {location} from {start_date} to {end_date} with a budget of {budget} dollars who is interested in {interests}. "
-              "Each event should include the time range, a detailed location address suitable for Google Maps, a description, the cost of the activity, and the total distance to be traveled. "
-              "Plan for multiple activities each day, totaling around 8-10 hours of activities per day. "
-              "Suggest the most eco-friendly activities possible. "
-              "The itinerary should be structured day by day, with each day containing a list of events, in the format: "
-              "{'date': 'YYYY-MM-DD', 'activities': [{'begin': 'start_time', 'end': 'end_time', 'location': 'full_address', 'description': 'activity description', 'cost': activity_cost, 'distance': total_distance_in_km}]}.")
+    prompt = (f"Create a detailed itinerary optimized for sustainability for a trip to {location} from {start_date} to {end_date} with a budget of {budget} dollars, for a traveler interested in {interests}. "
+          "Each event should include the time range, a detailed location address suitable for Google Maps, a description, the cost of the activity, and the total distance to be traveled. "
+          "Plan for multiple activities each day, totaling around 8-10 hours of activities per day. "
+          "Suggest the most eco-friendly activities possible, prioritizing walking, biking, and public transportation over car travel to minimize CO2 emissions. "
+          "Organize the activities in a logical order to minimize travel distance between locations and ensure no additional CO2 emissions are incurred. "
+          "The itinerary should be structured day by day, with each day containing a list of events, in the format: "
+          "{'date': 'YYYY-MM-DD', 'activities': [{'begin': 'start_time', 'end': 'end_time', 'location': 'full_address', 'description': 'activity description', 'cost': activity_cost, 'distance': total_distance_in_km}]}."
+          "Include a summary at the end of each day with the total distance traveled and the estimated CO2 emissions saved compared to car travel.")
+
 
     result = structured_llm.invoke(prompt).dict()
     
