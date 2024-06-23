@@ -52,14 +52,16 @@ type DayPlanProps = {
 };
 
 function DayPlan({ title, plan }: DayPlanProps) {
+  const activityMap = plan.activities ? (
+    plan.activities.map((activity) => <ActivityCard activity={activity} />)
+  ) : (
+    <></>
+  );
+
   return (
     <>
       <h3 className="text-2xl font-bold p-4">{title}</h3>
-      <div className="space-y-4">
-        {plan.activities.map((activity) => (
-          <ActivityCard activity={activity} />
-        ))}
-      </div>
+      <div className="space-y-4">{activityMap}</div>
     </>
   );
 }
