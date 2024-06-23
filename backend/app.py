@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify
 import os
+from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain.prompts import ChatPromptTemplate
 from typing import List
 from datetime import datetime, timedelta
-import json
+from langchain_core.output_parsers import JsonOutputParser
 
 app = Flask(__name__)
 
+# Set your OpenAI API key from environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
+
+# Define the model
+# llm = ChatOpenAI(model="gpt-3.5-turbo")
 llm = ChatGroq(temperature=0, model="mixtral-8x7b-32768")
 
 
@@ -21,18 +26,15 @@ class ItineraryItem(BaseModel):
     begin: str = Field(description="Start time of the activity")
     end: str = Field(description="End time of the activity")
     cost: float = Field(description="Cost of the activity (USD)")
-    carbon_footprint: float = Field(
-        description="Carbon footprint of the activity (kg CO2e)"
-    )
     transportation_method: str = Field(
-        description="Method of transportation to the next activity"
+        description="Method of transportation to the next activity, if public transportation,  specify bus or train."
     )
     distance: float = Field(description="Distance traveled for the activity (miles)")
     transportation_emissions: float = Field(
-        description="Estimated CO2 emissions from transportation (kg CO2e)"
+        description="Estimated CO2 emissions from selected source of transportation (kg CO2e), 0 if walking or biking, 0.03 kg for a 30 min bus ride."
     )
     travel_time_to_next: str = Field(
-        description="Total travel time to the next destination"
+        description="Total travel time to from the previous destination to the next destination, do not underestimate, use the distance to find time of travel"
     )
     transportation_cost_to_next: float = Field(
         description="Total travel cost to the next destination (USD)"
@@ -48,13 +50,15 @@ class Itinerary(BaseModel):
     days: List[DayItinerary] = Field(description="Daily itinerary")
 
 
-def get_travel_recommendation_stream(location, budget, interests, start_date, end_date):
+structured_llm = llm.with_structured_output(Itinerary)
+
+
+def get_travel_recommendation(location, budget, interests, start_date, end_date):
     start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
     end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
     num_days = (end_date_obj - start_date_obj).days + 1
 
-    prompt = ChatPromptTemplate.from_template(
-        """Create a detailed and sustainable itinerary for a {num_days}-day trip to {location} from {start_date} to {end_date} with a total budget of {budget} dollars.
+    prompt = f"""Create a detailed and sustainable itinerary for a {num_days}-day trip to {location} from {start_date} to {end_date} with a total budget of {budget} dollars.
     The traveler is interested in {interests}.
     Plan for multiple activities each day, starting at 9 am and ending at 10 pm. Include breakfast, lunch, and dinner each day.
     Consider transportation time between activities and suggest eco-friendly options.
@@ -63,30 +67,20 @@ def get_travel_recommendation_stream(location, budget, interests, start_date, en
     Provide detailed information for each activity as specified in the ItineraryItem model.
     The itinerary should cover all {num_days} days of the trip.
     
-    Follow this verbage for your trip descriptions:
     
-    "description": "Take a hike up Grizzly Peak for stunning views of the Bay Area. This eco-friendly activity is perfect for nature lovers."
-    "description": "End your day with a delicious vegan dinner at Souley Vegan, a restaurant known for its plant-based soul food and commitment to sustainability."
-    "description": "Enjoy a peaceful evening stroll at the Berkeley Marina, taking in the beautiful sunset views over the bay."
-    "description": "Start your day with a unique breakfast experience at Cheeseboard Collective, a worker-owned cooperative bakery known for its fresh and organic baked goods."
-    "description": "Explore the beautiful Berkeley Rose Garden, a historic landmark featuring over 1,500 rose bushes and stunning views of the Golden Gate Bridge."
-    "description": "Engage with interactive exhibits and learn about science, technology, and the environment at the Lawrence Hall of Science."
+    follow this verbage for your trip descriptions: 
     
-    Format the output as a valid JSON object representing the Itinerary model."""
-    )
+    "description": "Take a hike up Grizzly Peak for stunning views of the Bay Area. This eco-friendly activity is perfect for nature lovers.
+    "description": "End your day with a delicious vegan dinner at Souley Vegan, a restaurant known for its plant-based soul food and commitment to sustainability.
+    "description": "Enjoy a peaceful evening stroll at the Berkeley Marina, taking in the beautiful sunset views over the bay.
+    "description": "Start your day with a unique breakfast experience at Cheeseboard Collective, a worker-owned cooperative bakery known for its fresh and organic baked goods.
+    "description": "Explore the beautiful Berkeley Rose Garden, a historic landmark featuring over 1,500 rose bushes and stunning views of the Golden Gate Bridge.
+    "description": "Engage with interactive exhibits and learn about science, technology, and the environment at the Lawrence Hall of Science.",
+    
+    """
 
-    chain = prompt | llm
-
-    return chain.stream(
-        {
-            "num_days": num_days,
-            "location": location,
-            "budget": budget,
-            "interests": interests,
-            "start_date": start_date,
-            "end_date": end_date,
-        }
-    )
+    result = structured_llm.invoke(prompt)
+    return result
 
 
 @app.route("/")
@@ -123,15 +117,11 @@ def travel():
     if start_date_obj > end_date_obj:
         return jsonify({"error": "start_date must be before end_date"}), 400
 
-    def generate():
-        string = 
-        for chunk in get_travel_recommendation_stream(
-            location, budget, interests, start_date, end_date
-        ):
-            
-            yield f"data: {json.dumps(chunk.content)}\n\n"
+    recommendation = get_travel_recommendation(
+        location, budget, interests, start_date, end_date
+    )
 
-    return Response(generate(), content_type="text/event-stream")
+    return jsonify(recommendation.dict())
 
 
 if __name__ == "__main__":
