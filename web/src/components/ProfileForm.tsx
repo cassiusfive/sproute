@@ -136,7 +136,7 @@ export function ProfileForm() {
               <FormItem className="space-y-3">
                 <FormLabel>Interests</FormLabel>
                 <FormControl>
-                  <div className="grid grid-cols-2 space-y-1">
+                  <div className="grid grid-cols-2 gap-2 items-center">
                     {[
                       "sightseeing",
                       "adventure",

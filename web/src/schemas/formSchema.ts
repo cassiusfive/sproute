@@ -18,11 +18,11 @@ export const formSchema = z.object({
   type: z
     .array(
       z.enum([
-        "Sightseeing",
-        "Cultural",
-        "Adventure",
-        "Relaxation",
-        "Culinary",
+        "sightseeing",
+        "cultural",
+        "adventure",
+        "relaxation",
+        "culinary",
       ]),
       {
         required_error: "You need to select at least one interest.",
