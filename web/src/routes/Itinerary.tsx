@@ -3,6 +3,26 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import DayPlan, { DayItinerary } from "../components/DayPlan";
 import DownloadIcs from "../components/DownloadIcs";
+import { Skeleton } from "../components/ui/skeleton";
+
+function SkeletonItinerary() {
+  return (
+    <>
+      <div className="rounded-lg w-max-4xl">
+        <Skeleton className="ml-4 w-24 h-12 rounded-xl my-8" />
+        <Skeleton className="w-[90vw] w-max-4xl h-32 px-8 rounded-xl" />
+        <Skeleton className="w-[90vw] h-16 px-4 rounded-xl my-8" />
+        <Skeleton className="w-[90vw] w-max-4xl h-32 px-8 rounded-xl" />
+      </div>
+      <div className="rounded-lg w-max-4xl">
+        <Skeleton className="ml-4 w-24 h-12 rounded-xl my-8" />
+        <Skeleton className="w-[90vw] w-max-4xl h-32 px-8 rounded-xl" />
+        <Skeleton className="w-[90vw] h-16 px-4 rounded-xl my-8" />
+        <Skeleton className="w-[90vw] w-max-4xl h-32 px-8 rounded-xl" />
+      </div>
+    </>
+  );
+}
 
 async function fetchItinerary(formdata: any): Promise<DayItinerary[]> {
   const payload = JSON.parse(formdata);
@@ -58,6 +78,7 @@ function Itinerary() {
         <div className="">
           <div className="flex flex-col items-center space-y-2 my-6">
             <h1 className="text-4xl font-bold text-center">Itinerary</h1>
+            {!itinerary && <SkeletonItinerary />}
             {itinerary && <DownloadIcs itinerary={itinerary} />}
           </div>
           {itineraryComponent}

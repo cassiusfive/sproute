@@ -53,6 +53,10 @@ function ActivityCard({ activity, hideTransport = false }: ActivityCardProps) {
         </CardHeader>
         <CardContent className="flex flex-col space-y-2 md:flex-row justify-between items-start md:items-center text-green-900">
           <div className="flex items-center gap-2">
+            <MapPin />
+            <span>{activity.location}</span>
+          </div>
+          <div className="flex items-center gap-2">
             <Clock />
             <span>{activity.begin + " - " + activity.end}</span>
           </div>
@@ -60,24 +64,16 @@ function ActivityCard({ activity, hideTransport = false }: ActivityCardProps) {
             <CircleDollarSign className="min-w-[1.25rem]" />
             <span>{activity.cost}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin />
-            <span>{activity.location}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Earth />
-            <span className="text-green-700 font-semibold">
-              {activity.carbon_footprint} kg CO2
-            </span>
-          </div>
         </CardContent>
       </Card>
       {!hideTransport && (
-        <div className="w-full p-4 rounded-md my-2 border-2 border-green-300 shadow-lg bg-green-50">
+        <div className="w-full p-4 rounded-md my-6 border-2 border-green-300 shadow-lg bg-green-50">
           <div className="flex justify-between items-center text-green-900">
             <div className="flex items-center gap-2">
               <Map />
-              <span>{activity.transportation_method}</span>
+              <span className="capitalize">
+                {activity.transportation_method}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <CircleDollarSign className="min-w-[1.25rem]" />
@@ -89,7 +85,13 @@ function ActivityCard({ activity, hideTransport = false }: ActivityCardProps) {
             </div>
             <div className="flex items-center gap-2">
               <Footprints />
-              <span>{activity.distance} km</span>
+              <span>{activity.distance} miles</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Earth />
+              <span className="text-green-700 font-semibold">
+                {activity.transportation_emissions} kg CO2
+              </span>
             </div>
           </div>
         </div>
@@ -106,7 +108,7 @@ type DayPlanProps = {
 function DayPlan({ title, plan }: DayPlanProps) {
   return (
     <div className="bg-green-100 p-6 rounded-lg shadow-lg">
-      <h3 className="text-3xl font-bold text-green-900 mb-6">{title}</h3>
+      <h3 className="text-3xl font-bold mb-6 ml-4">{title}</h3>
       <div className="">
         {plan.activities.map((activity, i) => (
           <ActivityCard
