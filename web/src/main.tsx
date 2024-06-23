@@ -4,6 +4,7 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/Home.tsx";
 import Planner from "./routes/Planner.tsx";
+import Rewards from "./routes/Rewards.tsx";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   { path: "/planner", element: <Planner /> },
+  { path: "/rewards", element: <Rewards /> }, 
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
