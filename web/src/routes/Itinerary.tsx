@@ -33,12 +33,35 @@ const SAMPLE_DATA: Activity[][] = [
   ],
 ];
 
+async function fetchItinerary(formdata: any): Promise<Activity[][]> {
+  const payload = JSON.parse(formdata);
+  payload.start_date = payload.dateRange.from.split("T")[0];
+  payload.end_date = payload.dateRange.to.split("T")[0];
+  payload.vehicle_type = "car";
+  payload.group_size = 4;
+  payload.interests = ["sightseeing"];
+
+  console.log(payload);
+
+  const res = await fetch(import.meta.env.VITE_BACKEND_API + "/travel", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  console.log(await res.json());
+
+  return [];
+}
+
 function Itinerary() {
   const location = useLocation();
   const [dayPlans, setDayPlans] = useState<Activity[][]>(SAMPLE_DATA);
 
   useEffect(() => {
-    console.log(location.state.formdata);
+    fetchItinerary(location.state.formdata).then((plans) => setDayPlans(plans));
   }, [location]);
 
   return (
