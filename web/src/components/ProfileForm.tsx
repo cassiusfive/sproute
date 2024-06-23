@@ -39,8 +39,8 @@ export function ProfileForm() {
       location: "",
       budget: 1000, // Set an initial value for budget
       dateRange: {
-        from: new Date(2022, 0, 20),
-        to: addDays(new Date(2022, 0, 20), 20),
+        from: new Date(2024, 7, 22),
+        to: addDays(new Date(2024, 7, 23), 0),
       },
       type: "sightseeing", // Set an initial value for interest
     },
@@ -203,9 +203,10 @@ function DatePickerWithRange({
     setDate(value);
   }, [value]);
 
-  React.useEffect(() => {
-    onChange(date as DateRange);
-  }, [date, onChange]);
+  const handleSelect = (selectedDate: DateRange | undefined) => {
+    setDate(selectedDate);
+    onChange(selectedDate as DateRange);
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -216,7 +217,7 @@ function DatePickerWithRange({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -240,7 +241,7 @@ function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={handleSelect}
             numberOfMonths={2}
           />
         </PopoverContent>
@@ -248,3 +249,4 @@ function DatePickerWithRange({
     </div>
   );
 }
+
