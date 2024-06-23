@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flask-backend
+    env_file: ".env"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: vite-web
+    environment:
+      - ""
+    ports:
+      - "5173:5173"
