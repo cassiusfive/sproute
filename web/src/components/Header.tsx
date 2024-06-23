@@ -11,7 +11,10 @@ function Header() {
           <Sprout className="text-green-600" />
         </Link>
       </div>
-      <div>
+      <div className="flex items-center">
+        <Link to="/rewards" className="text-green-600 hover:text-green-800 font-semibold mr-8">
+          Rewards
+        </Link>
         <Button
           variant="default"
           className="bg-green-600 hover:bg-green-800"

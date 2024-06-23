@@ -70,12 +70,12 @@ export function ProfileForm() {
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location</FormLabel>
+                <FormLabel>Where do you want to travel?</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter location" {...field} />
                 </FormControl>
                 <FormDescription>
-                  This is your preferred location.
+                
                 </FormDescription>
                 <FormMessage />
               </FormItem>
