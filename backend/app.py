@@ -46,8 +46,8 @@ def calculate_co2_emissions(vehicle_type, group_size, distance):
     total_emissions = emission_factor * distance * group_size
     return total_emissions
 
-def get_travel_recommendation(location, budget, start_date, end_date, vehicle_type, group_size):
-    prompt = (f"Create a detailed itinerary for a trip to {location} from {start_date} to {end_date} with a budget of {budget} dollars. "
+def get_travel_recommendation(location, budget, interests, start_date, end_date, vehicle_type, group_size):
+    prompt = (f"Create a detailed itinerary for a trip to {location} from {start_date} to {end_date} with a budget of {budget} dollars who is interested in {interests}. "
               "Each event should include the time range, a detailed location address suitable for Google Maps, a description, the cost of the activity, and the total distance to be traveled. "
               "Plan for multiple activities each day, totaling around 8-10 hours of activities per day. "
               "Suggest the most eco-friendly activities possible. "
@@ -59,7 +59,7 @@ def get_travel_recommendation(location, budget, start_date, end_date, vehicle_ty
     # Calculate CO2 emissions for each activity
     for day in result['itinerary']:
         for activity in day['activities']:
-            distance = activity['distance']  # Total distance for the activity in km
+            distance = activity.get('distance', 0)  # Ensure distance is obtained correctly
             activity['co2_emissions'] = calculate_co2_emissions(vehicle_type, group_size, distance)
 
     return result
@@ -73,6 +73,7 @@ def travel():
     data = request.json
     location = data.get('location')
     budget = data.get('budget')
+    interests = data.get('interests')
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     vehicle_type = data.get('vehicle_type')
@@ -87,17 +88,18 @@ def travel():
 
     if not location or not budget or not start_date or not end_date or not vehicle_type or not group_size:
         return jsonify({
-            'error': 'Please provide location, budget, start_date, end_date, vehicle_type, and group_size'
+            'error': 'Please provide location, budget, interests, start_date, end_date, vehicle_type, and group_size'
         }), 400
 
     if start_date_obj > end_date_obj:
         return jsonify({'error': 'start_date must be before end_date'}), 400
 
-    recommendation = get_travel_recommendation(location, budget, start_date, end_date, vehicle_type, group_size)
+    recommendation = get_travel_recommendation(location, budget, interests, start_date, end_date, vehicle_type, group_size)
 
     return jsonify({
         'location': location,
         'budget': budget,
+        'interests': interests,
         'start_date': start_date,
         'end_date': end_date,
         'itinerary': recommendation['itinerary']
