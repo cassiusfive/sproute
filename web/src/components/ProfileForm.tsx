@@ -12,7 +12,7 @@ import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
 import {
   Popover,
@@ -37,12 +37,12 @@ export function ProfileForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       location: "",
-      budget: 1000, // Set an initial value for budget
+      budget: 500, // Set an initial value for budget
       dateRange: {
         from: new Date(2024, 7, 22),
         to: addDays(new Date(2024, 7, 23), 0),
       },
-      type: "sightseeing", // Set an initial value for interest
+      type: [], // Initialize as empty array for multiple interests
     },
   });
 
@@ -92,8 +92,9 @@ export function ProfileForm() {
                 <FormControl>
                   <Slider
                     defaultValue={[field.value]}
+                    min={50}
                     max={5000}
-                    step={100}
+                    step={50}
                     onValueChange={(value) => {
                       setBudget(value[0]);
                       field.onChange(value[0]);
@@ -135,44 +136,25 @@ export function ProfileForm() {
               <FormItem className="space-y-3">
                 <FormLabel>Interests</FormLabel>
                 <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="sightseeing" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Sightseeing</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="adventure" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Adventure</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="relaxation" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Relaxation</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="cultural" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Cultural</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="food_and_drink" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Food & Drink
-                      </FormLabel>
-                    </FormItem>
-                  </RadioGroup>
+                  <div className="flex flex-col space-y-1">
+                    {["sightseeing", "adventure", "relaxation", "cultural", "food_and_drink"].map((interest) => (
+                      <FormItem key={interest} className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value.includes(interest)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange([...field.value, interest]);
+                              } else {
+                                field.onChange(field.value.filter((value: string) => value !== interest));
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal capitalize">{interest.replace('_', ' ')}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -249,4 +231,3 @@ function DatePickerWithRange({
     </div>
   );
 }
-
