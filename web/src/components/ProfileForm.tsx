@@ -136,9 +136,18 @@ export function ProfileForm() {
               <FormItem className="space-y-3">
                 <FormLabel>Interests</FormLabel>
                 <FormControl>
-                  <div className="flex flex-col space-y-1">
-                    {["sightseeing", "adventure", "relaxation", "cultural", "food_and_drink"].map((interest) => (
-                      <FormItem key={interest} className="flex items-center space-x-3 space-y-0">
+                  <div className="grid grid-cols-2 space-y-1">
+                    {[
+                      "sightseeing",
+                      "adventure",
+                      "relaxation",
+                      "cultural",
+                      "culinary",
+                    ].map((interest) => (
+                      <FormItem
+                        key={interest}
+                        className="flex items-center space-x-3 space-y-0"
+                      >
                         <FormControl>
                           <Checkbox
                             checked={field.value.includes(interest)}
@@ -146,12 +155,18 @@ export function ProfileForm() {
                               if (checked) {
                                 field.onChange([...field.value, interest]);
                               } else {
-                                field.onChange(field.value.filter((value: string) => value !== interest));
+                                field.onChange(
+                                  field.value.filter(
+                                    (value: string) => value !== interest,
+                                  ),
+                                );
                               }
                             }}
                           />
                         </FormControl>
-                        <FormLabel className="font-normal capitalize">{interest.replace('_', ' ')}</FormLabel>
+                        <FormLabel className="font-normal capitalize">
+                          {interest.replace("_", " ")}
+                        </FormLabel>
                       </FormItem>
                     ))}
                   </div>
@@ -199,7 +214,7 @@ function DatePickerWithRange({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />

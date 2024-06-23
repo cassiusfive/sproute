@@ -15,10 +15,18 @@ export const formSchema = z.object({
       to: z.date().optional(),
     })
     .optional(),
-  type: z.array(
-    z.enum(["sightseeing", "adventure", "relaxation", "cultural", "food_and_drink"]),
-    {
-      required_error: "You need to select at least one interest.",
-    },
-  ).nonempty("You need to select at least one interest."),
+  type: z
+    .array(
+      z.enum([
+        "Sightseeing",
+        "Cultural",
+        "Adventure",
+        "Relaxation",
+        "Culinary",
+      ]),
+      {
+        required_error: "You need to select at least one interest.",
+      },
+    )
+    .nonempty("You need to select at least one interest."),
 });
