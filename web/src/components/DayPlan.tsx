@@ -13,7 +13,12 @@ export type Activity = {
   description: string;
   begin: string;
   end: string;
-  address: string;
+  location: string;
+};
+
+export type DayItinerary = {
+  activities: Activity[];
+  date: string; // YYYY-MM-DD
 };
 
 type ActivityCardProps = {
@@ -34,7 +39,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
         </div>
         <div className="flex items-center gap-1">
           <MapPin />
-          {activity.address}
+          {activity.location}
         </div>
       </CardContent>
     </Card>
@@ -42,16 +47,16 @@ function ActivityCard({ activity }: ActivityCardProps) {
 }
 
 type DayPlanProps = {
-  day: number;
-  activities: Activity[];
+  title: string;
+  plan: DayItinerary;
 };
 
-function DayPlan({ day, activities }: DayPlanProps) {
+function DayPlan({ title, plan }: DayPlanProps) {
   return (
     <>
-      <h3 className="text-2xl font-bold p-4">{"Day " + day}</h3>
+      <h3 className="text-2xl font-bold p-4">{title}</h3>
       <div className="space-y-4">
-        {activities.map((activity) => (
+        {plan.activities.map((activity) => (
           <ActivityCard activity={activity} />
         ))}
       </div>
