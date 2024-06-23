@@ -2,6 +2,7 @@ import Header from "../components/Header";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import DayPlan, { DayItinerary } from "../components/DayPlan";
+import DownloadIcs from "../components/DownloadIcs";
 
 async function fetchItinerary(formdata: any): Promise<DayItinerary[]> {
   const payload = JSON.parse(formdata);
@@ -74,6 +75,7 @@ function Itinerary() {
       <main className="flex flex-col px-4 items-center">
         <div>
           <h1 className="text-4xl font-bold text-center mt-4">Itinerary</h1>
+          {itinerary && <DownloadIcs itinerary={itinerary} />}
           {itineraryComponent}
         </div>
       </main>
