@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
 from datetime import datetime, timedelta
@@ -9,9 +10,12 @@ app = Flask(__name__)
 
 # Set your OpenAI API key from environment variables
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
+
 
 # Define the model
-llm = ChatOpenAI(model="gpt-4")
+# llm = ChatOpenAI(model="gpt-4")
+llm = ChatGroq(model="llama3-8b-8192")
 
 
 class ItineraryItem(BaseModel):
@@ -63,7 +67,19 @@ def get_travel_recommendation(location, budget, interests, start_date, end_date)
     Provide a variety of activities across all days, avoiding repetition.
     Ensure each day has a unique set of activities that showcase different aspects of {location}.
     Provide detailed information for each activity as specified in the ItineraryItem model.
-    The itinerary should cover all {num_days} days of the trip."""
+    The itinerary should cover all {num_days} days of the trip.
+    
+    
+    follow this verbage for your trip descriptions: 
+    
+    "description": "Take a hike up Grizzly Peak for stunning views of the Bay Area. This eco-friendly activity is perfect for nature lovers.
+    "description": "End your day with a delicious vegan dinner at Souley Vegan, a restaurant known for its plant-based soul food and commitment to sustainability.
+    "description": "Enjoy a peaceful evening stroll at the Berkeley Marina, taking in the beautiful sunset views over the bay.
+    "description": "Start your day with a unique breakfast experience at Cheeseboard Collective, a worker-owned cooperative bakery known for its fresh and organic baked goods.
+    "description": "Explore the beautiful Berkeley Rose Garden, a historic landmark featuring over 1,500 rose bushes and stunning views of the Golden Gate Bridge.
+    "description": "Engage with interactive exhibits and learn about science, technology, and the environment at the Lawrence Hall of Science.",
+    
+    """
 
     result = structured_llm.invoke(prompt)
     return result
